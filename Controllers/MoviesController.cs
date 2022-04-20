@@ -20,7 +20,7 @@ namespace TestApp.Controllers
             _context = context;
         }
 
-        // GET: Movies
+        //GET: Movies
         // "パート 7、ASP.NET Core MVC アプリへの検索の追加"以降はこのメソッドをコメントアウトする
         public IActionResult Index()
         {
@@ -49,32 +49,32 @@ namespace TestApp.Controllers
         //}
 
         // "パート 7、ASP.NET Core MVC アプリへの検索の追加"の、「ジャンルによる検索の追加」以降はこのメソッドのコメントアウトを解除する
-        // public IActionResult Index(string movieGenre, string searchString)
-        // {
-        //     IQueryable<string> genreQuery = from m in _context.Movie
-        //                                     orderby m.Genre
-        //                                     select m.Genre;
-        //     var movies = from m in _context.Movie
-        //                  select m;
+        public IActionResult Index(string movieGenre, string searchString)
+        {
+            IQueryable<string> genreQuery = from m in _context.Movies
+                                            orderby m.Genre
+                                            select m.Genre;
+            var movies = from m in _context.Movies
+                         select m;
 
-        //     if (!string.IsNullOrEmpty(searchString))
-        //     {
-        //         movies = movies.Where(s => s.Title!.Contains(searchString));
-        //     }
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                movies = movies.Where(s => s.Title!.Contains(searchString));
+            }
 
-        //     if (!string.IsNullOrEmpty(movieGenre))
-        //     {
-        //         movies = movies.Where(x => x.Genre == movieGenre);
-        //     }
+            if (!string.IsNullOrEmpty(movieGenre))
+            {
+                movies = movies.Where(x => x.Genre == movieGenre);
+            }
 
-        //     var movieGenreVM = new MovieGenreViewModel
-        //     {
-        //         Genres = new SelectList(genreQuery.Distinct().ToList()),
-        //         Movies = movies.ToList()
-        //     };
+            var movieGenreVM = new MovieGenreViewModel
+            {
+                Genres = new SelectList(genreQuery.Distinct().ToList()),
+                Movies = movies.ToList()
+            };
 
-        //     return View(movieGenreVM);
-        // }
+            return View(movieGenreVM);
+        }
 
         // GET: Movies/Details/5
         public IActionResult Details(int? id)
