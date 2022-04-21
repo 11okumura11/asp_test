@@ -16,5 +16,6 @@ namespace asp_test.Models.Data
         public string Genre { get; set; } = null!;
 
         public double Price { get; set; }
+        public string? Rating { get; set; }
     }
 }

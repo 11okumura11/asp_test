@@ -22,10 +22,10 @@ namespace TestApp.Controllers
 
         //GET: Movies
         // "パート 7、ASP.NET Core MVC アプリへの検索の追加"以降はこのメソッドをコメントアウトする
-        public IActionResult Index()
-        {
-            return View(_context.Movies.ToList());
-        }
+        //public IActionResult Index()
+        //{
+        //    return View(_context.Movies.ToList());
+        //}
 
         //[HttpPost]
         //public string Index(string searchString, bool notUsed)
@@ -76,6 +76,25 @@ namespace TestApp.Controllers
             return View(movieGenreVM);
         }
 
+        //detailsのコメントurlからidを取得
+        public IActionResult Index(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var comments = from c in _context.Comments
+                           where c.Movieid == id
+                           select c;
+            
+            if (comments == null)
+            {
+                return NotFound();
+            }
+            return View(comments);
+        }
+
         // GET: Movies/Details/5
         public IActionResult Details(int? id)
         {
@@ -105,7 +124,7 @@ namespace TestApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create([Bind("Id,Title,ReleaseDate,Genre,Price")] Movie movie)
+        public IActionResult Create([Bind("Id,Title,ReleaseDate,Genre,Price,Rating")] Movie movie)
         {
             if (ModelState.IsValid)
             {
@@ -137,7 +156,7 @@ namespace TestApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, [Bind("Id,Title,ReleaseDate,Genre,Price")] Movie movie)
+        public IActionResult Edit(int id, [Bind("Id,Title,ReleaseDate,Genre,Price,Rating")] Movie movie)
         {
             if (id != movie.Id)
             {
