@@ -5,7 +5,7 @@ namespace asp_test.Models
 {
     public class CommentsUsersViewModels
     {
-        public List<CommentsUsersViewModels>? commentsUsers { get; set; }
+        public List<CommentsUsersViewModels>? CommentsUsers { get; set; }
         public int? CommentId { get; set; }
         public string? Name { get; set; }
         public String? Gender { get; set; }

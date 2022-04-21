@@ -15,8 +15,12 @@ build_property.GenerateRazorMetadataSourceChecksumAttributes =
 build_property.MSBuildProjectDirectory = C:\work\プロジェクト\ASP.NET研修\asp_test
 build_property._RazorSourceGeneratorDebug = 
 
-[C:/work/プロジェクト/ASP.NET研修/asp_test/Views/commentsUsers/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcY29tbWVudHNVc2Vyc1xJbmRleC5jc2h0bWw=
+[C:/work/プロジェクト/ASP.NET研修/asp_test/Views/CommentsUsers/create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29tbWVudHNVc2Vyc1xjcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/work/プロジェクト/ASP.NET研修/asp_test/Views/CommentsUsers/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29tbWVudHNVc2Vyc1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/work/プロジェクト/ASP.NET研修/asp_test/Views/HelloWorld/Index.cshtml]
