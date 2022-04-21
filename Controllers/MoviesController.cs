@@ -76,24 +76,6 @@ namespace TestApp.Controllers
             return View(movieGenreVM);
         }
 
-        //detailsのコメントurlからidを取得
-        public IActionResult Index(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var comments = from c in _context.Comments
-                           where c.Movieid == id
-                           select c;
-            
-            if (comments == null)
-            {
-                return NotFound();
-            }
-            return View(comments);
-        }
 
         // GET: Movies/Details/5
         public IActionResult Details(int? id)
