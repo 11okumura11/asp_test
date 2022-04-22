@@ -66,8 +66,7 @@ namespace asp_test.Controllers
 
             var Users = from u in _context.Users
                         select u;
-            var Uid = from u in _context.Users
-                      select u.Id;
+
 
 
             if (Users == null)
@@ -78,8 +77,7 @@ namespace asp_test.Controllers
             var CommentsUsersCM = new CommentsUsersCreateModels
             {
                 //Users = new SelectList(Users.Distinct().ToList()),
-                Users = Users.ToList(),
-                Uid = new SelectList(Uid.Distinct().ToList()),
+                Users = Users.ToList()
             };
 
             return View(CommentsUsersCM);
