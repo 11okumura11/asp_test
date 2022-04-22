@@ -1,4 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿#nullable disable
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using asp_test.Models.Data;
 using asp_test.Models;
 
@@ -42,7 +49,8 @@ namespace asp_test.Controllers
 
             var CommentsUsersVM = new CommentsUsersViewModels
             {
-                CommentsUsers = CommentsUsers.ToList()
+                CommentsUsers = CommentsUsers.ToList(),
+                MovieId = id
             };
 
             return View(CommentsUsersVM);
@@ -57,11 +65,10 @@ namespace asp_test.Controllers
             }
 
             var Users = from u in _context.Users
-                        select new
-                        {
-                           Uid = u.Id,
-                           Uname = u.Name
-                        };
+                        select u;
+            var Uid = from u in _context.Users
+                      select u.Id;
+
 
             if (Users == null)
             {
@@ -70,7 +77,9 @@ namespace asp_test.Controllers
 
             var CommentsUsersCM = new CommentsUsersCreateModels
             {
-                Users = Users.ToList()
+                //Users = new SelectList(Users.Distinct().ToList()),
+                Users = Users.ToList(),
+                Uid = new SelectList(Uid.Distinct().ToList()),
             };
 
             return View(CommentsUsersCM);
@@ -80,15 +89,27 @@ namespace asp_test.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create([Bind("Id, Movieid, Userid, Comment1, CreatedAt ")] Comment comment)
+        public IActionResult Create(int id ,[Bind("Userid, Comment1")] CommentsUsersCreateModels CommentsUsersCM)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(comment);
+                var query = from c in _context.Comments
+                            select c.Id;
+
+                _context.Add(new Comment
+                {
+                    Id = query.Max() + 1,
+                    Movieid = id,
+                    Userid = CommentsUsersCM.Userid,                
+                    Comment1 = CommentsUsersCM.Comment1,
+                    CreatedAt = DateTime.Now
+            });
+
+                // SaveChangesが呼び出された段階で初めてInsert文が発行される
                 _context.SaveChanges();
                 return RedirectToAction(nameof(Index));
             }
-            return View(comment);
+            return View(CommentsUsersCM);
         }
 
     }

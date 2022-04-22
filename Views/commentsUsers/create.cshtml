@@ -14,8 +14,12 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Userid" class="control-label"></label>
-                <select asp-for="Userid" asp-items="Model.Users.Name" class="form-control">
-                        <option value=""></option>
+                <select asp-for="Userid"  class="form-control">
+                    @foreach (var item in Model.Users) {
+                        <option value="">
+                         @Html.DisplayFor(modelItem => item.Name)
+                    </option>
+                   }
                 </select>
                 <span asp-validation-for="Userid" class="text-danger"></span>
             </div>
