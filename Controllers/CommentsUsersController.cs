@@ -59,35 +59,30 @@ namespace asp_test.Controllers
         // GET: Movies/Create
         public IActionResult Create(int? id)
         {
-            if (id == null)
+            IEnumerable<User> users = _context.Users;
+            if (users == null)
             {
                 return NotFound();
             }
 
-            var Users = from u in _context.Users
-                        select u;
+            IEnumerable<SelectListItem> items = users.Select(u => 
+            new SelectListItem() { Value = u.Id.ToString(), Text = u.Name});
 
+            var CommentsUsersVM = new CommentsUsersViewModels(){ UsersList = items };
 
-
-            if (Users == null)
+            if (CommentsUsersVM == null)
             {
                 return NotFound();
             }
 
-            var CommentsUsersCM = new CommentsUsersCreateModels
-            {
-                //Users = new SelectList(Users.Distinct().ToList()),
-                Users = Users.ToList()
-            };
-
-            return View(CommentsUsersCM);
+            return View(CommentsUsersVM);
         }
         // POST: Movies/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(int id ,[Bind("Userid, Comment1")] CommentsUsersCreateModels CommentsUsersCM)
+        public IActionResult Create(int id ,[Bind("Userid, Comment1")] CommentsUsersViewModels CommentsUsersVM)
         {
             if (ModelState.IsValid)
             {
@@ -98,17 +93,90 @@ namespace asp_test.Controllers
                 {
                     Id = query.Max() + 1,
                     Movieid = id,
-                    Userid = CommentsUsersCM.Userid,                
-                    Comment1 = CommentsUsersCM.Comment1,
+                    Userid = CommentsUsersVM.Userid,                
+                    Comment1 = CommentsUsersVM.Comment1,
                     CreatedAt = DateTime.Now
-            });
+                });
 
                 // SaveChangesが呼び出された段階で初めてInsert文が発行される
                 _context.SaveChanges();
+                return RedirectToAction("Index",new { Id = id });
+            }
+            return View(CommentsUsersVM);
+        }
+
+        public IActionResult Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var Users = from u in _context.Users
+                        select u;
+
+            if (Users == null)
+            {
+                return NotFound();
+            }
+
+            var comment = _context.Comments.Find(id);
+
+            if (comment == null)
+            {
+                return NotFound();
+            }
+
+            var CommentsUsersVM = new CommentsUsersViewModels
+            {
+                Users = Users.ToList(),
+                CommentId = comment.Id,
+                Comment1 = comment.Comment1,
+                Userid = comment.Userid
+            };
+
+            return View(CommentsUsersVM);
+        }
+
+        // POST: Movies/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, [Bind("Id,Title,ReleaseDate,Genre,Price,Rating")] Movie movie)
+        {
+            if (id != movie.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(movie);
+                    _context.SaveChanges();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!MovieExists(movie.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
                 return RedirectToAction(nameof(Index));
             }
-            return View(CommentsUsersCM);
+            return View(movie);
         }
+        private bool MovieExists(int id)
+        {
+            return _context.Movies.Any(e => e.Id == id);
+        }
+
 
     }
 }
