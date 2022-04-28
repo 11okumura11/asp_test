@@ -81,7 +81,7 @@ namespace asp_test.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(int id ,String UsersList, [Bind("UsersList, Comment1")] CommentsUsersViewModels CommentsUsersVM )
+        public IActionResult Create(int id, String UsersList, [Bind("UsersList, Comment1")] CommentsUsersViewModels CommentsUsersVM)
         {
             if (ModelState.IsValid)
             {
@@ -144,26 +144,71 @@ namespace asp_test.Controllers
         {
             if (ModelState.IsValid)
             {
-                int Userid = int.Parse(UsersList);
+                Comment comment = _context.Comments.Find(id);
 
-                Comment comment = new Comment()
-                {
-                    Userid = Userid,
-                    Comment1 = CommentsUsersVM.Comment1,
-                    UpdatedAt = DateTime.Now
-                };
+                comment.Userid = int.Parse(UsersList);
+                comment.Comment1 = CommentsUsersVM.Comment1;
+                comment.UpdatedAt = DateTime.Now;
 
                 _context.Comments.Update(comment);
+      
                 // SaveChangesが呼び出された段階で初めてInsert文が発行される
                 _context.SaveChanges();
 
-                return RedirectToAction("Index", new { Id = id });
+                return RedirectToAction("Index", new { Id = comment.Movieid });
             }
             return View(CommentsUsersVM);
         }
-        private bool CommentsExists(int id)
+
+        // GET: Movies/Delete/5
+        public IActionResult Delete(int? id)
         {
-            return _context.Comments.Any(e => e.Id == id);
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var comment = _context.Comments.Find(id);
+
+            if (comment == null)
+            {
+                return NotFound();
+            }
+
+            var user = _context.Users.Find(comment.Userid);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            CommentsUsersViewModels CommentsUsersVM = new CommentsUsersViewModels()
+            {
+                MovieId = comment.Movieid,
+                Name = user.Name,
+                Gender = ( user.Gender? "男性" : "女性"),
+                Comment1 = comment.Comment1,
+                CreatedAt = comment.CreatedAt
+            };
+
+            if (CommentsUsersVM == null)
+            {
+                return NotFound();
+            }
+
+
+            return View(CommentsUsersVM);
+        }
+
+        // POST: Movies/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            var comment = _context.Comments.Find(id);
+            _context.Comments.Remove(comment);
+            _context.SaveChanges();
+            return RedirectToAction("Index", new { Id = comment.Movieid });
         }
     }
 }

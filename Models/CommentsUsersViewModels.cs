@@ -14,8 +14,6 @@ namespace asp_test.Models
         public String? Comment1 { get; set; }
         public DateTime? CreatedAt { get; set; }
 
-        public DateTime? UpdatedAt { get; set; }
-
         public List<Data.User>? Users { get; set; }
         public IEnumerable<SelectListItem> UsersList { get; set; }
         public int Userid { get; set; }
