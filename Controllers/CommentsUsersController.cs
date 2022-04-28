@@ -65,10 +65,9 @@ namespace asp_test.Controllers
                 return NotFound();
             }
 
-            IEnumerable<SelectListItem> items = users.Select(u => 
-            new SelectListItem() { Value = u.Id.ToString(), Text = u.Name});
-
-            var CommentsUsersVM = new CommentsUsersViewModels(){ UsersList = items };
+            CommentsUsersViewModels CommentsUsersVM = new CommentsUsersViewModels();
+            ViewBag.UsersList = new SelectList(_context.Users, "Id", "Name");
+            CommentsUsersVM.UsersList = ViewBag.UsersList;
 
             if (CommentsUsersVM == null)
             {
@@ -82,18 +81,20 @@ namespace asp_test.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(int id ,[Bind("Userid, Comment1")] CommentsUsersViewModels CommentsUsersVM)
+        public IActionResult Create(int id ,String UsersList, [Bind("UsersList, Comment1")] CommentsUsersViewModels CommentsUsersVM )
         {
             if (ModelState.IsValid)
             {
                 var query = from c in _context.Comments
                             select c.Id;
 
+                 int Userid = int.Parse(UsersList);
+
                 _context.Add(new Comment
                 {
                     Id = query.Max() + 1,
                     Movieid = id,
-                    Userid = CommentsUsersVM.Userid,                
+                    Userid = Userid,                
                     Comment1 = CommentsUsersVM.Comment1,
                     CreatedAt = DateTime.Now
                 });
@@ -112,28 +113,24 @@ namespace asp_test.Controllers
                 return NotFound();
             }
 
-            var Users = from u in _context.Users
+            var users = from u in _context.Users
                         select u;
 
-            if (Users == null)
+            if (users == null)
             {
                 return NotFound();
             }
 
-            var comment = _context.Comments.Find(id);
-
+            Comment comment = _context.Comments.Find(id);
             if (comment == null)
             {
                 return NotFound();
             }
 
-            var CommentsUsersVM = new CommentsUsersViewModels
-            {
-                Users = Users.ToList(),
-                CommentId = comment.Id,
-                Comment1 = comment.Comment1,
-                Userid = comment.Userid
-            };
+            CommentsUsersViewModels CommentsUsersVM = new CommentsUsersViewModels();
+                ViewBag.UsersList = new SelectList(_context.Users, "Id", "Name", comment.Userid);
+                CommentsUsersVM.UsersList = ViewBag.UsersList;
+                CommentsUsersVM.Comment1 = comment.Comment1;
 
             return View(CommentsUsersVM);
         }
@@ -143,40 +140,30 @@ namespace asp_test.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, [Bind("Id,Title,ReleaseDate,Genre,Price,Rating")] Movie movie)
+        public IActionResult Edit(int id, String UsersList, [Bind("UsersList, Comment1")] CommentsUsersViewModels CommentsUsersVM)
         {
-            if (id != movie.Id)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
-                try
+                int Userid = int.Parse(UsersList);
+
+                Comment comment = new Comment()
                 {
-                    _context.Update(movie);
-                    _context.SaveChanges();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!MovieExists(movie.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                    Userid = Userid,
+                    Comment1 = CommentsUsersVM.Comment1,
+                    UpdatedAt = DateTime.Now
+                };
+
+                _context.Comments.Update(comment);
+                // SaveChangesが呼び出された段階で初めてInsert文が発行される
+                _context.SaveChanges();
+
+                return RedirectToAction("Index", new { Id = id });
             }
-            return View(movie);
+            return View(CommentsUsersVM);
         }
-        private bool MovieExists(int id)
+        private bool CommentsExists(int id)
         {
-            return _context.Movies.Any(e => e.Id == id);
+            return _context.Comments.Any(e => e.Id == id);
         }
-
-
     }
 }
